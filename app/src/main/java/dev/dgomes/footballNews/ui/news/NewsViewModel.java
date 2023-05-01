@@ -1,53 +1,59 @@
 package dev.dgomes.footballNews.ui.news;
 
+import android.os.AsyncTask;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.google.android.material.snackbar.Snackbar;
-
-import java.util.ArrayList;
 import java.util.List;
 
-import dev.dgomes.footballNews.data.FootballNewsService;
+import dev.dgomes.footballNews.data.FootballNewsRepository;
 import dev.dgomes.footballNews.domain.NewsData;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class NewsViewModel extends ViewModel {
 
-    private final MutableLiveData<List<NewsData>> newsList = new MutableLiveData<>();
-    private final FootballNewsService api;
-
-    public NewsViewModel() {
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://dgomesdev.github.io/Api-simulations/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        api = retrofit.create(FootballNewsService.class);
-        this.findNews();
+    public enum State {
+        LOADING, SUCCESS, ERROR;
     }
 
-    private void findNews() {
-        api.getNews().enqueue(new Callback<List<NewsData>>() {
+    private final MutableLiveData<List<NewsData>> newsList = new MutableLiveData<>();
+    private final MutableLiveData<State> state = new MutableLiveData<>();
+
+    public NewsViewModel() {
+        loadNews();
+    }
+
+    public void loadNews() {
+        state.setValue(State.LOADING);
+        FootballNewsRepository.getInstance().getRemoteApi().getNews().enqueue(new Callback<List<NewsData>>() {
             @Override
             public void onResponse(Call<List<NewsData>> call, Response<List<NewsData>> response) {
-                if (response.isSuccessful()) newsList.setValue(response.body());
+                if (response.isSuccessful()) {
+                    newsList.setValue(response.body());
+                    state.setValue(State.SUCCESS);
+                } else state.setValue(State.ERROR);
             }
 
             @Override
-            public void onFailure(Call<List<NewsData>> call, Throwable t) {
-
+            public void onFailure(Call<List<NewsData>> call, Throwable error) {
+                state.setValue(State.ERROR);
             }
         });
     }
 
+    public void saveNews(NewsData news) {
+        AsyncTask.execute(() -> FootballNewsRepository.getInstance().getDatabase().newsDao().save(news));
+        }
+
     public LiveData<List<NewsData>> getNews() {
-        return newsList;
+        return this.newsList;
+    }
+
+    public LiveData<State> getState() {
+        return this.state;
     }
 }

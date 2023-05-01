@@ -1,8 +1,6 @@
-package dev.dgomes.footballNews;
+package dev.dgomes.footballNews.ui;
 
 import android.os.Bundle;
-
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
@@ -10,6 +8,10 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import dev.dgomes.footballNews.R;
+import dev.dgomes.footballNews.data.local.NewsDatabase;
 import dev.dgomes.footballNews.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
@@ -33,5 +35,4 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.navView, navController);
     }
-
 }

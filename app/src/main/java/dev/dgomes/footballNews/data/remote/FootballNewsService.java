@@ -1,4 +1,4 @@
-package dev.dgomes.footballNews.data;
+package dev.dgomes.footballNews.data.remote;
 
 import java.util.List;
 
