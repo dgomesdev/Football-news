@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import dev.dgomes.footballNews.data.local.NewsDao;
+import dev.dgomes.footballNews.data.local.NewsLocalDataSource;
 import dev.dgomes.footballNews.data.remote.NewsRemoteDataSource;
 import dev.dgomes.footballNews.data.remote.NewsRemoteEntity;
 import dev.dgomes.footballNews.domain.ApiException;
@@ -27,17 +27,17 @@ import retrofit2.Response;
 public class NewsRepositoryImpl implements NewsRepository {
 
     final NewsRemoteDataSource remoteApi;
-    final NewsDao newsDao;
+    final NewsLocalDataSource database;
     final ExecutorService dbExecutor;
 
     @Inject
     public NewsRepositoryImpl(
             NewsRemoteDataSource remoteApi,
-            NewsDao newsDao,
+            NewsLocalDataSource database,
             ExecutorService dbExecutor
     ) {
         this.remoteApi = remoteApi;
-        this.newsDao = newsDao;
+        this.database = database;
         this.dbExecutor = dbExecutor;
     }
 
@@ -46,7 +46,7 @@ public class NewsRepositoryImpl implements NewsRepository {
         MutableLiveData<Result<List<NewsModel>>> result = new MutableLiveData<>();
         try {
 
-            return Transformations.map(newsDao.getAllNews(), list -> {
+            return Transformations.map(database.getAllNews(), list -> {
                 try {
                     List<NewsModel> mapped = list.stream()
                             .map(NewsModel::fromLocal)
@@ -67,7 +67,7 @@ public class NewsRepositoryImpl implements NewsRepository {
         MutableLiveData<Result<List<NewsModel>>> result = new MutableLiveData<>();
         try {
 
-            return Transformations.map(newsDao.getFavoriteNews(), list -> {
+            return Transformations.map(database.getFavoriteNews(), list -> {
                 try {
                     List<NewsModel> mapped = list.stream()
                             .map(NewsModel::fromLocal)
@@ -85,7 +85,7 @@ public class NewsRepositoryImpl implements NewsRepository {
 
     @Override
     public void updateFavoriteStatus(int newsId, boolean isFavorite) {
-        dbExecutor.execute(() -> newsDao.updateFavoriteStatus(newsId, isFavorite));
+        dbExecutor.execute(() -> database.updateFavoriteStatus(newsId, isFavorite));
     }
 
     @Override
@@ -96,7 +96,7 @@ public class NewsRepositoryImpl implements NewsRepository {
                 if (response.isSuccessful() && response.body() != null) {
                     dbExecutor.execute(() ->
                             response.body().forEach(remote ->
-                                    newsDao.save(NewsModel.fromRemote(remote).toLocalNews()
+                                    database.save(NewsModel.fromRemote(remote).toLocalNews()
                                     )
                             )
                     );

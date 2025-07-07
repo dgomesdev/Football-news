@@ -1,9 +1,12 @@
 package dev.dgomes.footballNews.data.local;
 
-import androidx.room.Database;
-import androidx.room.RoomDatabase;
+import androidx.lifecycle.LiveData;
 
-@Database(entities = {NewsLocalEntity.class}, version = 1, exportSchema = false)
-public abstract class NewsLocalDataSource extends RoomDatabase {
-    public abstract NewsDao newsDao();
+import java.util.List;
+
+public interface NewsLocalDataSource {
+    LiveData<List<NewsLocalEntity>> getAllNews();
+    LiveData<List<NewsLocalEntity>> getFavoriteNews();
+    void save(NewsLocalEntity news);
+    void updateFavoriteStatus(long newsId, boolean isFavorite);
 }
