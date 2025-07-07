@@ -32,7 +32,7 @@ public class NewsViewModel extends ViewModel {
             NewsState current = _uiState.getValue();
             if (current == null) return;
 
-            if (result instanceof Result.Success) {
+            if (result.isSuccess()) {
                 List<NewsModel> data = ((Result.Success<List<NewsModel>>) result).data;
                 _uiState.setValue(current.setSuccess(data));
             } else if (result instanceof Result.Error) {
