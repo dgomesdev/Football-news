@@ -1,59 +1,58 @@
 package dev.dgomes.footballNews.ui.news;
 
-import android.os.AsyncTask;
-
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.ViewModel;
 
 import java.util.List;
 
-import dev.dgomes.footballNews.data.FootballNewsRepository;
-import dev.dgomes.footballNews.domain.NewsData;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import javax.inject.Inject;
 
+import dagger.hilt.android.lifecycle.HiltViewModel;
+import dev.dgomes.footballNews.domain.NewsModel;
+import dev.dgomes.footballNews.domain.NewsRepository;
+import dev.dgomes.footballNews.domain.Result;
+
+@HiltViewModel
 public class NewsViewModel extends ViewModel {
 
-    public enum State {
-        LOADING, SUCCESS, ERROR;
+    private final NewsRepository newsRepository;
+
+    private final MediatorLiveData<NewsState> _uiState = new MediatorLiveData<>();
+    public LiveData<NewsState> getNewsState() {
+        return _uiState;
     }
 
-    private final MutableLiveData<List<NewsData>> newsList = new MutableLiveData<>();
-    private final MutableLiveData<State> state = new MutableLiveData<>();
+    @Inject
+    public NewsViewModel(NewsRepository newsRepository) {
+        this.newsRepository = newsRepository;
+        _uiState.setValue(new NewsState().setLoading());
 
-    public NewsViewModel() {
-        loadNews();
-    }
+        _uiState.addSource(newsRepository.getAllNews(), result -> {
+            NewsState current = _uiState.getValue();
+            if (current == null) return;
 
-    public void loadNews() {
-        state.setValue(State.LOADING);
-        FootballNewsRepository.getInstance().getRemoteApi().getNews().enqueue(new Callback<List<NewsData>>() {
-            @Override
-            public void onResponse(Call<List<NewsData>> call, Response<List<NewsData>> response) {
-                if (response.isSuccessful()) {
-                    newsList.setValue(response.body());
-                    state.setValue(State.SUCCESS);
-                } else state.setValue(State.ERROR);
-            }
-
-            @Override
-            public void onFailure(Call<List<NewsData>> call, Throwable error) {
-                state.setValue(State.ERROR);
+            if (result instanceof Result.Success) {
+                List<NewsModel> data = ((Result.Success<List<NewsModel>>) result).data;
+                _uiState.setValue(current.setSuccess(data));
+            } else if (result instanceof Result.Error) {
+                Exception error = ((Result.Error<?>) result).exception;
+                _uiState.setValue(current.setError(error.getMessage()));
             }
         });
     }
 
-    public void saveNews(NewsData news) {
-        AsyncTask.execute(() -> FootballNewsRepository.getInstance().getDatabase().newsDao().save(news));
-        }
-
-    public LiveData<List<NewsData>> getNews() {
-        return this.newsList;
+    public void fetchNews() {
+        assert _uiState.getValue() != null;
+        _uiState.setValue(_uiState.getValue().setLoading());
+        newsRepository.fetchNews();
     }
 
-    public LiveData<State> getState() {
-        return this.state;
+    public void toggleFavorite(NewsModel news) {
+        NewsState current = _uiState.getValue();
+        if (current != null) {
+            _uiState.setValue(current.setLoading());
+        }
+        newsRepository.updateFavoriteStatus(news.id, !news.isFavorite);
     }
 }

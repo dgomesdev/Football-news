@@ -2,16 +2,13 @@ package dev.dgomes.footballNews;
 
 import android.app.Application;
 
-public class App  extends Application {
+import dagger.hilt.android.HiltAndroidApp;
 
-    private static App instance;
-    public static App getInstance() {
-        return instance;
-    }
+@HiltAndroidApp
+public class App  extends Application {
 
     @Override
     public void onCreate() {
         super.onCreate();
-        instance = this;
     }
 }

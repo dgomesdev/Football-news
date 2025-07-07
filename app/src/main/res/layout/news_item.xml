@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="@dimen/standard_margin"
-    app:cardCornerRadius="@dimen/standard_margin"
+    app:cardBackgroundColor="@color/material_dynamic_neutral90"
     app:cardElevation="@dimen/standard_margin">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -17,6 +17,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/standard_margin"
+            android:contentDescription="@string/news_image"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -24,7 +25,7 @@
 
         <TextView
             android:id="@+id/newsTitle"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/standard_margin"
             tools:text="@string/title_news"
@@ -36,7 +37,7 @@
 
         <TextView
             android:id="@+id/newsText"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/standard_margin"
             tools:text="@string/title_news"
@@ -55,33 +56,35 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/newsText" />
 
-        <ImageView
+        <ImageButton
             android:id="@+id/favoriteIcon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_margin="@dimen/standard_margin"
             android:background="?android:selectableItemBackgroundBorderless"
             android:clickable="true"
+            android:contentDescription="@string/star_icon"
             android:focusable="true"
-            app:layout_constraintTop_toTopOf="@id/openLinkButton"
+            android:src="@drawable/ic_not_favorite"
             app:layout_constraintBottom_toBottomOf="@id/openLinkButton"
             app:layout_constraintEnd_toStartOf="@id/shareIcon"
-            android:layout_margin="@dimen/standard_margin"
-            android:src="@drawable/ic_not_favorite"/>
+            app:layout_constraintTop_toTopOf="@id/openLinkButton"
+            tools:ignore="TouchTargetSizeCheck" />
 
-         <ImageView
+        <ImageButton
             android:id="@+id/shareIcon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-             android:background="?android:selectableItemBackgroundBorderless"
-             android:clickable="true"
-             android:focusable="true"
-            app:layout_constraintTop_toTopOf="@id/openLinkButton"
+            android:layout_margin="@dimen/standard_margin"
+            android:background="?android:selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:contentDescription="@string/sharing_icon"
+            android:focusable="true"
+            android:src="@drawable/ic_share"
             app:layout_constraintBottom_toBottomOf="@id/openLinkButton"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_margin="@dimen/standard_margin"
-            android:src="@drawable/ic_share"/>
-
-
+            app:layout_constraintTop_toTopOf="@id/openLinkButton"
+            tools:ignore="TouchTargetSizeCheck" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

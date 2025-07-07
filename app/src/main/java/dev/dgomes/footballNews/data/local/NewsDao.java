@@ -8,15 +8,18 @@ import androidx.room.Query;
 
 import java.util.List;
 
-import dev.dgomes.footballNews.domain.NewsData;
-
 @Dao
 public interface NewsDao {
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void save(NewsData news);
+    @Query("SELECT * FROM newsdata")
+    LiveData<List<NewsLocalEntity>> getAllNews();
 
     @Query("SELECT * FROM newsdata WHERE isFavorite = 1")
-    LiveData<List<NewsData>> loadFavoriteNews();
+    LiveData<List<NewsLocalEntity>> getFavoriteNews();
 
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    void save(NewsLocalEntity news);
+
+    @Query("UPDATE newsdata SET isFavorite = :isFavorite WHERE id = :newsId")
+    void updateFavoriteStatus(long newsId, boolean isFavorite);
 }

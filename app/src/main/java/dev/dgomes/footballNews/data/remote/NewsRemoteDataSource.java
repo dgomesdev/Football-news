@@ -4,11 +4,10 @@ import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
-import dev.dgomes.footballNews.domain.NewsData;
 
-public interface FootballNewsService {
+public interface NewsRemoteDataSource {
 
     @GET("footballnews.json")
-    Call<List<NewsData>> getNews();
+    Call<List<NewsRemoteEntity>> getNews();
 
 }
